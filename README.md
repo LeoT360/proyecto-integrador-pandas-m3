@@ -1,4 +1,4 @@
-# Taller práctico: calidad de datos para la retención estudiantil
+# Taller práctico proyecto integrador: calidad de datos para la retención estudiantil
 
 Una institución de educación superior quiere entender qué factores están asociados a la deserción, para diseñar estrategias de retención tempranas. Antes de responder preguntas de análisis, el equipo de datos debe garantizar que la información sea confiable. Este taller trabaja justo ese paso: auditar, limpiar y documentar los datos, y después responder cinco preguntas con esos datos limpios.
 

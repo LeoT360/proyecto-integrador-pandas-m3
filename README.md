@@ -38,13 +38,23 @@ Ejecuta el comando desde la carpeta del proyecto.
 ## Estructura del proyecto
 
 ```
-├── analisis_desercion.py  Script principal. Tiene un TODO por cada paso.
-├── requirements.txt       Versiones de las librerías.
-├── LEEME_ambiente.txt     Pasos para crear el ambiente virtual.
+proyecto/
+├── analisis_desercion.py   Script principal. Tiene un TODO por cada paso.
+├── requirements.txt        Versiones de las librerías.
+├── LEEME_ambiente.txt      Pasos para crear el ambiente virtual.
+├── README.md               Este archivo.
+├── .gitignore              Archivos que Git no debe subir.
 └── Data/
-    ├── raw/               Datos originales (datos_estudiantes.csv). No los modifiques.
-    └── processed/         Resultados que genera el script.
+    ├── raw/
+    │   └── datos_estudiantes.csv   Dataset original. No lo modifiques.
+    └── processed/
+        ├── .gitkeep                Mantiene la carpeta en el repositorio.
+        ├── dataset_limpio.csv      Lo genera el script. No se sube (está en .gitignore).
+        ├── decisiones.csv          Lo genera el script. Sí se sube.
+        └── graficos/               Lo genera el script. Sí se sube.
 ```
+
+Lo que genera el script (`dataset_limpio.csv`, `decisiones.csv` y `graficos/`) aparece en `Data/processed/` al ejecutarlo. Los dos últimos se suben al repositorio, porque son parte de la entrega.
 
 ## Qué debes hacer
 

@@ -1,0 +1,23 @@
+# Ambiente virtual
+.venv/
+venv/
+env/
+
+# Archivos generados (no se suben)
+Data/processed/dataset_limpio.csv
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# IDE / sistema
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/

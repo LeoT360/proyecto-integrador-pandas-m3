@@ -1,88 +1,112 @@
-# Taller práctico proyecto integrador: calidad de datos para la retención estudiantil
+# Taller práctico: calidad de datos para la retención estudiantil
 
-Una institución de educación superior quiere entender qué factores están asociados a la deserción, para diseñar estrategias de retención tempranas. Antes de responder preguntas de análisis, el equipo de datos debe garantizar que la información sea confiable. Este taller trabaja justo ese paso: auditar, limpiar y documentar los datos, y después responder cinco preguntas con esos datos limpios.
+Proyecto de limpieza y análisis de un dataset sintético de estudiantes. El objetivo es dejar los datos confiables antes de responder preguntas sobre deserción.
 
-Los datos son sintéticos. Fueron generados para el taller y no corresponden a estudiantes reales.
+## Cómo ejecutar
 
-## Requisitos
+```bash
+python -m venv .venv
+source .venv/bin/activate   # en Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python main.py
+```
 
-- Python 3.10 o superior
-- Git
-- Lo visto en los talleres de Pandas y de limpieza de datos
-
-## Cómo empezar
-
-1. Clona el repositorio y entra a la carpeta del proyecto:
-
-   ```
-   git clone <URL-DEL-REPOSITORIO>
-   cd <NOMBRE-DE-LA-CARPETA>
-   ```
-
-2. Crea y activa un ambiente virtual. Las instrucciones para Windows y Mac/Linux están en `LEEME_ambiente.txt`.
-
-3. Instala las librerías:
-
-   ```
-   pip install -r requirements.txt
-   ```
-
-4. Ejecuta el script:
-
-   ```
-   python analisis_desercion.py
-   ```
-
-Ejecuta el comando desde la carpeta del proyecto.
-
-## Estructura del proyecto
+## Estructura
 
 ```
-proyecto/
-├── analisis_desercion.py   Script principal. Tiene un TODO por cada paso.
-├── requirements.txt        Versiones de las librerías.
-├── LEEME_ambiente.txt      Pasos para crear el ambiente virtual.
-├── README.md               Este archivo.
-├── .gitignore              Archivos que Git no debe subir.
+├── main.py                 Orquesta todo el flujo
+├── config.py               Rutas, VALIDOS y registrar()
+├── explorar.py             Primera mirada y diccionario
+├── auditar.py              Conteo de problemas de calidad
+├── limpieza.py             Numéricos, categorías y fechas
+├── tratamiento.py          Duplicados, faltantes e imposibles
+├── variables.py            desertor y cuartil_asistencia
+├── graficos.py             Los 4 gráficos
+├── preguntas.py            Las 5 preguntas de negocio
+├── guardar.py              Guarda dataset_limpio y decisiones
+├── requirements.txt
+├── LEEME_ambiente.txt
 └── Data/
-    ├── raw/
-    │   └── datos_estudiantes.csv   Dataset original. No lo modifiques.
+    ├── raw/datos_estudiantes.csv
     └── processed/
-        ├── .gitkeep                Mantiene la carpeta en el repositorio.
-        ├── dataset_limpio.csv      Lo genera el script. No se sube (está en .gitignore).
-        ├── decisiones.csv          Lo genera el script. Sí se sube.
-        └── graficos/               Lo genera el script. Sí se sube.
+        ├── dataset_limpio.csv
+        ├── decisiones.csv
+        └── graficos/
 ```
 
-Lo que genera el script (`dataset_limpio.csv`, `decisiones.csv` y `graficos/`) aparece en `Data/processed/` al ejecutarlo. Los dos últimos se suben al repositorio, porque son parte de la entrega.
+## Mis decisiones y respuestas
 
-## Qué debes hacer
+### Alumno: Jesús Leonardo Torre Melgarejo
+### Documento: 1020497992
 
-Completa los TODO de `analisis_desercion.py` en orden. Cada función tiene un docstring con preguntas: respóndelas antes de escribir el código. Cada decisión que tomes debe quedar registrada con `registrar()`.
+### 0. Diccionario de datos
 
-Cuando termines, el script debe producir:
+| Columna | Tipo | Rol | Descripción |
+|---------|------|-----|-------------|
+| id_estudiante | texto | identificación | Código único del estudiante |
+| programa | categórica | explicativa | Carrera en la que está matriculado |
+| facultad | categórica | explicativa | Facultad del programa |
+| jornada | categórica | explicativa | Diurna, nocturna o fin de semana |
+| semestre | numérica | explicativa | Semestre que cursa |
+| promedio_acumulado | numérica | explicativa | Promedio de notas (escala 0-5) |
+| creditos_aprobados | numérica | explicativa | Créditos ya aprobados |
+| materias_reprobadas | numérica | explicativa | Materias perdidas |
+| asistencia_pct | numérica | explicativa | Porcentaje de asistencia |
+| sesiones_tutoria | numérica | explicativa | Veces que fue a tutoría |
+| cambios_programa | numérica | explicativa | Si cambió de programa |
+| estrato | categórica | explicativa | Estrato socioeconómico (1-6) |
+| beca | categórica | explicativa | Si recibe beca (sí/no) |
+| trabaja | categórica | explicativa | Si trabaja mientras estudia |
+| horas_trabajo_semana | numérica | explicativa | Horas que trabaja a la semana |
+| distancia_km | numérica | explicativa | Kilómetros casa-institución |
+| edad | numérica | explicativa | Edad en años |
+| genero | categórica | explicativa | Género registrado |
+| ciudad_procedencia | categórica | explicativa | Ciudad de origen |
+| tipo_colegio | categórica | explicativa | Público o privado |
+| fecha_matricula | fecha | explicativa | Fecha de matrícula |
+| estado | categórica | resultado | Activo, graduado o desertor |
+| motivo_retiro | categórica | resultado | Razón del retiro (solo desertores) |
 
-- `Data/processed/dataset_limpio.csv`: el dataset limpio.
-- `Data/processed/decisiones.csv`: la tabla de decisiones.
-- `Data/processed/graficos/`: los cuatro gráficos.
+### 1. Diagnóstico de calidad
 
-La guía del taller (`Taller_Retencion_Estudiantil.docx`) explica cada método antes de usarlo, con ejemplos y errores frecuentes.
+- Nulos reales en promedio, distancia, ciudad, tipo de colegio y motivo_retiro.
+- Faltantes disfrazados: guiones en asistencia y horas de trabajo, 999 en distancia.
+- 300 asistencias con signo %.
+- 150 filas duplicadas.
+- 12 edades fuera de 15-60 y 17 promedios mayores a 5.
+- Fechas en dos formatos distintos.
 
-## Entrega
+Lo que más dañaba el análisis eran los promedios > 5: un 78 en escala de 0-5 sube el promedio de toda la institución.
 
-Sube tu código completo al repositorio y envía el enlace por el formulario de entrega. La entrega es individual.
+### 2. Decisiones de limpieza
 
-El repositorio debe incluir:
+- Se quitó el % de asistencia y se convirtió a número; los guiones pasaron a nulo.
+- Horas de trabajo: guiones a nulo; si no trabaja se puso 0; valores > 100 se reemplazaron por la mediana de quienes sí trabajan.
+- Distancia 999 se trató como nulo.
+- Programa, jornada, género y ciudad se unificaron a una sola escritura.
+- Fechas se pasaron a datetime con ambos formatos.
+- Se eliminaron 150 duplicados.
+- Filas sin promedio se eliminaron (una nota no se inventa).
+- Ciudad y tipo de colegio nulos se rellenaron con "Sin dato".
+- Edades imposibles se reemplazaron por la mediana.
+- Promedios > 5 se volvieron nulos y se eliminaron esas filas.
 
-- `analisis_desercion.py` con todos los TODO completados.
-- `Data/processed/decisiones.csv` y la carpeta `Data/processed/graficos/`.
-- Un `README.md` al final de este archivo, con una sección titulada **Mis decisiones y respuestas**. Debe incluir:
-  0. El diccionario de datos: la tabla de las 23 columnas con tipo, descripción y rol, completada según el paso 1 de la guía.
-  1. Tu diagnóstico de calidad: qué problemas encontraste y en qué columnas.
-  2. Tus decisiones de limpieza, con su justificación.
-  3. Las respuestas a las cinco preguntas, cada una con el número de estudiantes por grupo.
-  4. Tu respuesta a la reflexión sobre asociación y causalidad.
-  5. Tu respuesta a la reflexión sobre `motivo_retiro` y la predicción.
-  6. Tu respuesta a la reflexión sobre el uso de variables sensibles.
+### 3. Respuestas a las cinco preguntas
 
-El script debe ejecutarse sin errores desde cero. Cada decisión necesita una justificación, y cada conclusión debe apoyarse en un número del análisis.
+1. **Programa con mayor deserción**: Ingeniería Industrial (~40 %) con 1.271 estudiantes.
+2. **Beca**: los becados desertan menos. Eso no prueba que la beca cause la permanencia; puede ser que quien recibe beca ya tenía mejores condiciones.
+3. **Jornada con menor promedio**: Nocturna (aprox. 3.46) con 2.666 estudiantes.
+4. **Materias reprobadas**: los desertores tienen más materias reprobadas que los activos. Se excluyen graduados porque no pertenecen a ninguno de los dos grupos.
+5. **Asistencia**: la deserción baja de Q1 a Q4. Hay asociación clara, pero no prueba causa.
+
+### 4. Reflexión 1 – Asociación y causalidad
+
+Si los becados desertan menos, no significa que la beca cause la permanencia. Puede ser que los que reciben beca ya venían con mejor promedio, más apoyo familiar o más motivación. Para hablar de causa habría que comparar grupos parecidos que solo se diferencien en la beca, y eso este dataset no permite.
+
+### 5. Reflexión 2 – Variables que no se deben usar para predecir
+
+`motivo_retiro` solo se conoce cuando el estudiante ya desertó. Usarla para “predecir” sería hacer trampa: es información del futuro. Lo mismo pasaría con cualquier columna que se llena después del evento que queremos anticipar.
+
+### 6. Reflexión 3 – Variables sensibles
+
+Género, estrato y ciudad pueden estar asociados a la deserción por desigualdades reales. Usarlos para decidir quién recibe apoyo puede reforzar sesgos: se estaría tratando diferente a la gente por características que no controla. Mejor enfocarse en variables de comportamiento académico (asistencia, materias reprobadas, promedio) que sí se pueden intervenir.

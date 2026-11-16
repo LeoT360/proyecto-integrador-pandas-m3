@@ -9,9 +9,14 @@ from config import GRAFICOS
 
 def grafico_faltantes(df: pd.DataFrame) -> None:
     GRAFICOS.mkdir(parents=True, exist_ok=True)
-    plt.figure(figsize=(12, 6))
-    sns.heatmap(df.isnull(), cbar=False, yticklabels=False)
-    plt.title("Mapa de valores faltantes")
+
+    nulos = df.isnull().sum()
+    nulos = nulos[nulos > 0].sort_values(ascending=True)
+
+    plt.figure(figsize=(10, 5))
+    nulos.plot(kind="barh", color="steelblue")
+    plt.title("Cantidad de valores faltantes por columna")
+    plt.xlabel("Número de nulos")
     plt.tight_layout()
     plt.savefig(GRAFICOS / "01_faltantes.png", dpi=120)
     plt.close()
@@ -21,12 +26,17 @@ def grafico_distribuciones(original: pd.DataFrame, limpio: pd.DataFrame) -> None
     GRAFICOS.mkdir(parents=True, exist_ok=True)
     fig, ejes = plt.subplots(2, 2, figsize=(12, 8))
 
-    columnas = ["promedio_acumulado", "edad"]
-    for i, col in enumerate(columnas):
-        sns.boxplot(y=original[col], ax=ejes[0, i], color="lightcoral")
-        ejes[0, i].set_title(f"{col} (antes)")
-        sns.boxplot(y=limpio[col], ax=ejes[1, i], color="lightgreen")
-        ejes[1, i].set_title(f"{col} (después)")
+    sns.boxplot(y=original["promedio_acumulado"], ax=ejes[0, 0], color="lightcoral")
+    ejes[0, 0].set_title("promedio_acumulado (antes)")
+
+    sns.boxplot(y=original["edad"], ax=ejes[0, 1], color="lightcoral")
+    ejes[0, 1].set_title("edad (antes)")
+
+    sns.boxplot(y=limpio["promedio_acumulado"], ax=ejes[1, 0], color="lightgreen")
+    ejes[1, 0].set_title("promedio_acumulado (después)")
+
+    sns.boxplot(y=limpio["edad"], ax=ejes[1, 1], color="lightgreen")
+    ejes[1, 1].set_title("edad (después)")
 
     plt.tight_layout()
     plt.savefig(GRAFICOS / "02_distribuciones.png", dpi=120)

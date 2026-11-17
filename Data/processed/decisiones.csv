@@ -1,0 +1,19 @@
+paso,columna,accion,filas_afectadas,justificacion
+convertir_numericos,asistencia_pct,quitar % y convertir a número; '-' a nulo,502,La columna venía como texto por el signo % y los guiones. Sin convertirla no se pueden calcular promedios ni cuartiles.
+convertir_numericos,horas_trabajo_semana,convertir a número; '-' a nulo,2822,"El guion impedía tratar la columna como numérica. Quienes no trabajan ya tienen 0, así que el guion se interpreta como dato faltante."
+convertir_numericos,distancia_km,999 a nulo,152,999 no es una distancia real. Se usa como código de faltante y distorsiona cualquier promedio.
+unificar_categorias,programa,strip + lower + replace de variantes,260,"Había variantes tipográficas (Psicologia / Psicología, Ingenieria de Sistemas). Sin unificar, los conteos se parten y las tasas salen mal."
+unificar_categorias,jornada,strip + lower + replace,485,Aparecían minúsculas y mayúsculas distintas. Se unifican a la forma canónica de VALIDOS.
+unificar_categorias,genero,strip + lower + replace de F/M y minúsculas,559,Había códigos cortos (F/M) y minúsculas. Se deja solo Femenino y Masculino.
+unificar_categorias,ciudad_procedencia,strip + lower + replace de acentos y mayúsculas,645,"Bogotá, Medellín y otras ciudades aparecían con y sin tilde, en mayúsculas y minúsculas. Se unifican."
+convertir_fechas,fecha_matricula,unificar AAAA-MM-DD y DD/MM/AAAA a datetime,10150,Había dos formatos distintos. Al convertir a datetime se puede ordenar y filtrar por fecha sin errores.
+eliminar_duplicados,todas,drop_duplicates + reset_index,150,Había filas idénticas. Dejarlas duplicaba el peso de esos estudiantes en cualquier tasa o promedio.
+tratar_faltantes,promedio_acumulado,eliminar filas con nulo,298,Una nota no se puede inventar. Sin promedio el estudiante no aporta al análisis de rendimiento.
+tratar_faltantes,ciudad_procedencia,rellenar nulos con 'Sin dato',96,"La ciudad no se puede adivinar, pero tampoco conviene borrar la fila. 'Sin dato' deja constancia de que faltaba."
+tratar_faltantes,tipo_colegio,rellenar nulos con 'Sin dato',145,Mismo criterio que ciudad: no se inventa el tipo de colegio y no se elimina la fila completa.
+tratar_imposibles,edad,edades fuera de 15-60 a nulo y luego mediana,12,Una edad de 12 o de 150 no es creíble en este contexto. La mediana no se deja arrastrar por extremos.
+tratar_imposibles,promedio_acumulado,promedios > 5 a nulo y eliminar esas filas,15,La escala es de 0 a 5. Un 78 es un error de registro y distorsiona cualquier promedio institucional.
+tratar_imposibles,horas_trabajo_semana,"si no trabaja, horas = 0",2703,"Si el estudiante declara que no trabaja, las horas deben ser cero. El nulo anterior era inconsistente."
+tratar_imposibles,horas_trabajo_semana,horas > 100 a nulo y luego mediana de quienes trabajan,58,Más de 100 horas a la semana no es realista. Se usa la mediana de los que sí trabajan para no inventar ceros.
+crear_variables,desertor,True si estado == 'desertor',3136,Convierte el estado en una columna booleana para poder calcular tasas con mean().
+crear_variables,cuartil_asistencia,qcut en 4 grupos de tamaño parecido,9490,"Los cuartiles agrupan por ranking de asistencia. Así se puede ver si la deserción sube cuando baja la asistencia, sin depender de cortes arbitrarios."
